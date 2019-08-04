@@ -88,7 +88,8 @@ count = 0
 train_saved = False
 for i, folder in enumerate(audio_path):
     for file in os.listdir(folder):
-        if file[-4:] == '.wav':
+        print('folder')
+        if file[-4:] == '.WAV':
             times, segs = VAD_chunk(2, folder+'/'+file)
             if segs == []:
                 print('No voice activity detected')
@@ -105,9 +106,11 @@ for i, folder in enumerate(audio_path):
             count = count + 1
             if count % 100 == 0:
                 print('Processed {0}/{1} files'.format(count, len(audio_path)))
+
     label = label + 1
     
     if not train_saved and i > train_speaker_num:
+        print('saving')
         train_sequence = np.concatenate(train_sequence,axis=0)
         train_cluster_id = np.asarray(train_cluster_id)
         np.save('train_sequence',train_sequence)

@@ -13,17 +13,36 @@ import numpy as np
 import sys
 import librosa
 import wave
+import soundfile as sf
 
 import webrtcvad
 
 from hparam import hparam as hp
 
 def read_wave(path, sr):
+    
     """Reads a .wav file.
     Takes the path, and returns (PCM audio data, sample rate).
     Assumes sample width == 2
     """
-    with contextlib.closing(wave.open(path, 'rb')) as wf:
+
+    print('path', path, sr)
+    #print('===================')
+    
+    try:
+        file = path
+        wave.open(path,'rb')
+
+    except wave.Error:
+        #print('Exception')
+        #print('========')
+        tmp, _ = librosa.load(path, sr)
+        sf.write('tmp.wav', tmp, sr)
+        file = 'tmp.wav'
+
+
+    
+    with contextlib.closing(wave.open(file, 'rb')) as wf:
         num_channels = wf.getnchannels()
         assert num_channels == 1
         sample_width = wf.getsampwidth()
@@ -31,7 +50,7 @@ def read_wave(path, sr):
         sample_rate = wf.getframerate()
         assert sample_rate in (8000, 16000, 32000, 48000)
         pcm_data = wf.readframes(wf.getnframes())
-    data, _ = librosa.load(path, sr)
+    data, _ = librosa.load(file, sr)
     assert len(data.shape) == 1
     assert sr in (8000, 16000, 32000, 48000)
     return data, pcm_data
@@ -130,8 +149,10 @@ def vad_collector(sample_rate, frame_duration_ms,
 def VAD_chunk(aggressiveness, path):
     audio, byte_audio = read_wave(path, hp.data.sr)
     vad = webrtcvad.Vad(int(aggressiveness))
+
     frames = frame_generator(20, byte_audio, hp.data.sr)
     frames = list(frames)
+
     times = vad_collector(hp.data.sr, 20, 200, vad, frames)
     speech_times = []
     speech_segs = []

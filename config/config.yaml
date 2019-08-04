@@ -1,12 +1,15 @@
-training: !!bool "true"
+training: !!bool "false"
 device: "cuda"
 unprocessed_data: './TIMIT/*/*/*/*.wav'
+#unprocessed_data: './libritts/*/*/*/*.wav'
 ---
 data:
     train_path: './train_tisv'
     train_path_unprocessed: './TIMIT/TRAIN/*/*/*.wav'
+    #train_path_unpreprocessed: './libritts-train-clean-100/*/*/*.wav'
     test_path: './test_tisv'
-    test_path_unprocessed: './TIMIT/TEST/*/*/*.wav'
+    test_path_unprocessed: './TIMIT/TEST/*/*/*.WAV'
+    #test_path_unpreprocessed: './libritts-test/*/*/*.wav'
     data_preprocessed: !!bool "true" 
     sr: 16000
     nfft: 512 #For mel spectrogram preprocess
@@ -26,7 +29,7 @@ train:
     M : 5 #Number of utterances per speaker
     num_workers: 0 #number of workers for dataloader
     lr: 0.01 
-    epochs: 950 #Max training speaker epoch 
+    epochs: 2 #Max training speaker epoch 
     log_interval: 30 #Epochs before printing progress
     log_file: './speech_id_checkpoint/Stats'
     checkpoint_interval: 120 #Save model after x speaker epochs
@@ -37,4 +40,4 @@ test:
     N : 4 #Number of speakers in batch
     M : 6 #Number of utterances per speaker
     num_workers: 8 #number of workers for data laoder
-    epochs: 10 #testing speaker epochs
+    epochs: 2 #testing speaker epochs
